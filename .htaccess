@@ -1,0 +1,41 @@
+RewriteEngine On
+RewriteBase /demo/
+
+# Permitir acceso directo a archivos y directorios existentes
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Permitir acceso directo a los assets
+RewriteRule ^(themes|uploads|assets)/ - [L]
+
+# Redirigir artículos al article.php
+RewriteRule ^article/([^/]+)/?$ /demo/article.php?slug=$1 [QSA,L]
+
+# Conservar el acceso a CSS, JS, imágenes y otros archivos estáticos
+RewriteCond %{REQUEST_URI} !\.(css|js|jpg|jpeg|png|gif|ico|woff|woff2|ttf|svg|eot|map|webp)$ [NC]
+
+# Regla para el resto de las URLs
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . index.php [L]
+
+# Cabeceras de acceso
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Permitir acceso a directorios específicos
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
+
+# Configuración de MIME types
+AddType application/javascript .js
+AddType text/css .css
+AddType image/svg+xml .svg
+AddType application/x-font-woff .woff
+AddType application/x-font-woff2 .woff2
